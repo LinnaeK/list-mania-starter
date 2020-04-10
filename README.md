@@ -1,29 +1,32 @@
+## install depencenies
+``` npm i
+npm i express path favicon logger
+npm run build```
+
+
 ## Set up back end
 
 ---------- server.js ---------
 
 - Create your server.js (in the list-mania directory)
 - Add express, favicon, and logger
- ```const express = require('express');
+- Require your database and create your routers
+- Mount middleware and routers
+- Identify the port  you want to use and start listening to it
+ 
+```const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
-const logger = require('morgan');```
+const logger = require('morgan');
 
-- Require your database and create your routers
-
-```require('./config/database')
+require('./config/database')
 
 const toDoRouter = require('./routes/api/todos')
 const toBuyRouter = require('./routes/api/tobuys')
-```
 
-- Mount middleware and routers
-
-```const app = express();
+const app = express()
 
 app.use(logger('dev'));
-app.use(express.json());
-
 app.use(express.json());
 
 app.use(favicon(path.join(__dirname, 'build', 'favicon.ico')));
@@ -35,11 +38,8 @@ app.use('/api/tobuys', toBuyRouter)
 app.get('/*', function(req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
-```
 
-- Identify the port  you want to use and start listening to it
-
-```const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3001;
 
 app.listen(port, function() {
   console.log(`Express app running on port ${port}`)
@@ -48,23 +48,23 @@ app.listen(port, function() {
 
 ------------------
 ## Connect to your Database
------------ database.js ----------
+----------- config/database.js ----------
  - require mongoose
- ```const mongoose = require('mongoose'); ```
-
  - connect to mongoose
+- turn mongoose "on"
 
-```mongoose.connect(
-  'Your url here',
+```const mongoose = require('mongoose')
+
+mongoose.connect(
+  'mongodb+srv://linnae:testing3@cluster0-vvyen.mongodb.net/test?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
     useFindAndModify: false
   }
-);```
+);
 
-- turn mongoose "on"
-```const db = mongoose.connection;
+const db = mongoose.connection;
 
 db.on('connected', function() {
   console.log(`Connected to MongoDB at ${db.host}:${db.port}`);
@@ -73,23 +73,23 @@ db.on('connected', function() {
 ## Create your models
 ----- models/tobuy.js ------
 - require mongoose and get access to the Schemas
-
-```var mongoose = require('mongoose');
-var Schema = mongoose.Schema;```
-
 - Write the Schema
-```var toBuySchema = new Schema({
+- Export the model
+
+```var mongoose = require('mongoose')
+var Schema = mongoose.Schema
+
+var toBuySchema = new Schema({
   item: {type: String, required: true},
   price: {type: Number},
   purchased: {type: Boolean, default: false}
 },{
   timestamps: true
-});```
+});
 
-- Export the model
-```module.exports = mongoose.model('toBuy', toBuySchema);```
+module.exports = mongoose.model('ToBuy', toBuySchema);```
 -------------------
-- do the same to todo.js
+- do the same to models/todo.js
 ```var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
@@ -107,21 +107,19 @@ module.exports = mongoose.model('Todo', toDoSchema);```
 
 ------- routes/api/tobuys.js -------
 - bring in your required files/espress/router
-```var express = require('express');
-var router = express.Router();
-var tobuysCtrl = require('../../controllers/api/tobuys');```
-
 - create your routes
+- export your router
 
-```router.get('/', tobuysCtrl.index);
+```const router = require('express').Router();
+var tobuysCtrl = require('../../controllers/api/tobuys');
+
+router.get('/', tobuysCtrl.index);
 router.get('/:id', tobuysCtrl.show);
 router.post('/', tobuysCtrl.create);
 router.delete('/:id', tobuysCtrl.delete);
-router.put('/:id', tobuysCtrl.update);```
+router.put('/:id', tobuysCtrl.update);
 
-- export your router
-
-```module.exports = router;```
+module.exports = router;```
 
 ------ routes/api/todos.js ------
 
@@ -140,26 +138,32 @@ router.put('/:id', todosCtrl.update);
 
 module.exports = router;```
 
+---------------
+- in your terminal type:
+```nodemon server```
+It should return with:
+
+Express app running on port 3001
+Connected to MongoDB at
 ----------------------
 ## Add your controllers
 
 ----------- controllers/api /tobuys.js------------
 - Require your model
-
-``` const ToBuy = require('../../models/tobuy'); ```
-
 - Setup you exports
-``` module.exports = {
-  index,
-  create,
-  show,
-  delete: deleteOne,
-  update
-}; ```
-
 - write your functions 
 
-``` async function index(req, res) {
+```const ToBuy = require('../../models/tobuy')
+
+module.exports = {
+  index,
+  create,
+  show, 
+  delete: deleteOne, 
+  update
+}
+
+async function index(req, res) {
   const toBuys = await ToBuy.find({});
   res.status(200).json(toBuys);
 }
@@ -182,7 +186,8 @@ async function deleteOne(req, res) {
 async function update(req, res) {
   const updatedToBuy = await ToBuy.findByIdAndUpdate(req.params.id, req.body, {new: true});
   res.status(200).json(updatedToBuy);
-} ```
+}```
+
 
 ----------- controllers/api/todos.js -------------
 - Add all the same things to todos.js
@@ -230,8 +235,7 @@ async function update(req, res) {
 
 
 -------------
-## Start your server!
-``` node server.js```
+## Check your server... and see if it is still happy. Maybe try postman to be sure everything is ready to go. 
 -----------------
 --------------------
 ## Work on your front end! 
