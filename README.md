@@ -1,7 +1,7 @@
-## install depencenies
-``` npm i
+## Install depencenies
+` npm i
 npm i express path favicon logger
-npm run build```
+npm run build `
 
 
 ## Set up back end
@@ -13,8 +13,10 @@ npm run build```
 - Require your database and create your routers
 - Mount middleware and routers
 - Identify the port  you want to use and start listening to it
- 
-```const express = require('express');
+
+
+```js
+const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
@@ -48,15 +50,34 @@ app.listen(port, function() {
 
 ------------------
 ## Connect to your Database
------------ config/database.js ----------
+-------- terminal ----------
+
+```npm i dotenv```
+
+----- server.js ----
+ABOVE YOUR DATABASE CONFIG:
+
+```js 
+require('dotenv').config();
+```
+
+------ (create) .env -------
+```js
+DATABASE_URL='your-database-url'
+```
+
+
+----------- (create) config/database.js ----------
  - require mongoose
  - connect to mongoose
 - turn mongoose "on"
 
-```const mongoose = require('mongoose')
+
+```js
+ const mongoose = require('mongoose')
 
 mongoose.connect(
-  'mongodb+srv://linnae:testing3@cluster0-vvyen.mongodb.net/test?retryWrites=true&w=majority',
+  process.env.DATABASE_URL,
   { useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -68,7 +89,9 @@ const db = mongoose.connection;
 
 db.on('connected', function() {
   console.log(`Connected to MongoDB at ${db.host}:${db.port}`);
-});```
+}); 
+```
+
 -----------------
 ## Create your models
 ----- models/tobuy.js ------
@@ -76,7 +99,8 @@ db.on('connected', function() {
 - Write the Schema
 - Export the model
 
-```var mongoose = require('mongoose')
+```js
+var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
 var toBuySchema = new Schema({
@@ -87,10 +111,14 @@ var toBuySchema = new Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('ToBuy', toBuySchema);```
+module.exports = mongoose.model('ToBuy', toBuySchema);
+```
+
 -------------------
 - do the same to models/todo.js
-```var mongoose = require('mongoose');
+
+```js
+var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var toDoSchema = new Schema({
@@ -100,7 +128,8 @@ var toDoSchema = new Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Todo', toDoSchema);```
+module.exports = mongoose.model('Todo', toDoSchema);
+```
 
 ------------------
 ## Create your Routes
@@ -110,7 +139,8 @@ module.exports = mongoose.model('Todo', toDoSchema);```
 - create your routes
 - export your router
 
-```const router = require('express').Router();
+```js
+const router = require('express').Router();
 var tobuysCtrl = require('../../controllers/api/tobuys');
 
 router.get('/', tobuysCtrl.index);
@@ -119,13 +149,15 @@ router.post('/', tobuysCtrl.create);
 router.delete('/:id', tobuysCtrl.delete);
 router.put('/:id', tobuysCtrl.update);
 
-module.exports = router;```
+module.exports = router;
+```
 
 ------ routes/api/todos.js ------
 
 - add all the same things :) 
 
-```var express = require('express');
+```js
+var express = require('express');
 var router = express.Router();
 var todosCtrl = require('../../controllers/api/todos');
 
@@ -136,11 +168,14 @@ router.post('/', todosCtrl.create);
 router.delete('/:id', todosCtrl.delete);
 router.put('/:id', todosCtrl.update);
 
-module.exports = router;```
+module.exports = router;
+```
 
 ---------------
 - in your terminal type:
-```nodemon server```
+
+`nodemon server`
+
 It should return with:
 
 Express app running on port 3001
@@ -148,12 +183,13 @@ Connected to MongoDB at
 ----------------------
 ## Add your controllers
 
------------ controllers/api /tobuys.js------------
+----------- (create) controllers/api /tobuys.js------------
 - Require your model
 - Setup you exports
 - write your functions 
 
-```const ToBuy = require('../../models/tobuy')
+```js 
+const ToBuy = require('../../models/tobuy')
 
 module.exports = {
   index,
@@ -186,13 +222,15 @@ async function deleteOne(req, res) {
 async function update(req, res) {
   const updatedToBuy = await ToBuy.findByIdAndUpdate(req.params.id, req.body, {new: true});
   res.status(200).json(updatedToBuy);
-}```
+}
+```
 
 
 ----------- controllers/api/todos.js -------------
 - Add all the same things to todos.js
 
-```const ToDo = require('../../models/todo');
+```js
+const ToDo = require('../../models/todo');
 
 module.exports = {
   index,
@@ -225,13 +263,17 @@ async function deleteOne(req, res) {
 async function update(req, res) {
   const updatedToDo = await ToDo.findByIdAndUpdate(req.params.id, req.body, {new: true});
   res.status(200).json(updatedToDo);
-}```
+}
+```
 
 -----------
 ## Set up your proxy so your front end and back end can communicate with each other
 
 -------package.json ------
-``` "proxy": "http://localhost:3001"```
+(at the bottoms, right before the closing bracket)
+```js
+ "proxy": "http://localhost:3001"
+ ```
 
 
 -------------
@@ -240,61 +282,78 @@ async function update(req, res) {
 --------------------
 ## Work on your front end! 
 
-- Set up your Router
-- npm i react-router-dom
+```js
+npm i react-router-dom
+```
+
 ----- index.js ----
 - require react-router-dom
-``` import {BrowserRouter as Router} from 'react-router-dom' ```
+```js
+ import {BrowserRouter as Router} from 'react-router-dom' 
+ ```
 - wrap your React.StrictMode in the Router
 
-```<Router>
+```html 
+<Router>
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-  </Router>,```
+</Router>,
+  ```
 
   ---- components/Header/Header.jsx -----
   - Create links for your app
   - import React and router
 
-  ```import React from 'react'
-import {Link} from 'react-router-dom' ```
+  ```js 
+  import React from 'react'
+import {Link} from 'react-router-dom' 
+```
 
 - create a functional component with a nav tag that has the following css:
 
-```navbar navbar-expand-lg navbar-light bg-light```
+```js
+navbar navbar-expand-lg navbar-light bg-light
+```
 
 - Add the words List Mania and links for each of your pages (separate each item with a few &nbsp;)
 
-``` <Link to='/'>Home</Link> &nbsp;&nbsp;&nbsp;&nbsp;
-            <Link to='/todos'>To Do List</Link> &nbsp;&nbsp;&nbsp;&nbsp;
-            <Link to='/tobuys'>To Buy List</Link>```
+```html
+ <Link to='/'>Home</Link> 
+ &nbsp;&nbsp;&nbsp;&nbsp;
+<Link to='/todos'>To Do List</Link> 
+&nbsp;&nbsp;&nbsp;&nbsp;
+<Link to='/tobuys'>To Buy List</Link>
+```
 
 
 -------- components/App/App.js ---------
 - import your header into App, place it in the return and test it out!
 
 - import your pages
-```import Header from '../Header/Header'
+```js
+import Header from '../Header/Header'
 import TodoPage from '../../pages/TodoPage/TodoPage'
 import TobuyPage from '../../pages/TobuyPage/TobuyPage'
-import Home from '../../pages/Home/Home'```
+import Home from '../../pages/Home/Home'
+```
 
 - create routes for your pages
   - Home
   - Todo
   - Tobuy
 
-``` <Route exact path='/' render={()=><Home />}/>
-      <Route exact path='/todos' render={()=>
-        <TodoPage 
-        />}
-      />
-      <Route exact path='/tobuys' render={()=>
-        <TobuyPage 
-        />}
-      />
-      ```
+```html
+<Route exact path='/' render={()=><Home />}/>
+<Route exact path='/todos' render={()=>
+  <TodoPage 
+  />}
+/>
+<Route exact path='/tobuys' render={()=>
+  <TobuyPage 
+  />}
+/>
+```
 -Test our Links and files!
 
 -----------------------
@@ -303,10 +362,12 @@ Time to get our data from the backend!
 -----src/services/todos-api.js ------ 
 - write our base url
 
-```const BASE_URL = '/api/todos';```
+```js
+const BASE_URL = '/api/todos';```
 
 - write our different functions
-```export function getAll() {
+```js
+export function getAll() {
   return fetch(BASE_URL)
   .then(res => res.json());
 }
@@ -331,27 +392,30 @@ export function deleteOne(id) {
   return fetch(`${BASE_URL}/${id}`, {
     method: 'DELETE'
   }).then(res => res.json());
-}```
-
-
-
+}
+```
 
 ------ src/components/App/App.jsx -----
 - Bring the data in when the component loads
 
 - Import the files
-```import * as todosAPI from '../../services/todos-api'```
+```js
+import * as todosAPI from '../../services/todos-api'
+```
 
 
 - write state to hold the data
-```state = {
+```js
+state = {
     todos: [],
     tobuys: []
-  }```
+  }
+```
 
 - write a componentDidMount function to bring in the data
 
-```async componentDidMount() {
+```js
+async componentDidMount() {
     const todos = await todosAPI.getAll()
     const tobuys = await tobuysAPI.getAll()
     console.log('todos', todos)
@@ -360,7 +424,8 @@ export function deleteOne(id) {
       todos,
       tobuys
     })
-  }```
+  }
+  ```
 
 -------------
 ## Now lets take a look at the components we have ready for us
@@ -373,42 +438,51 @@ export function deleteOne(id) {
 
 Time to write the handleAddTodo function in order to get the add to work
 
-```handleAddTodo = async todo => {
+```js
+handleAddTodo = async todo => {
     const newTodo = await todosAPI.create(todo)
     this.setState({
       todos: [...this.state.todos, newTodo]
     })
-  }```
+  }
+  ```
 
 ------- src/components/AddTodo.jsx ------
 - I just figured out how to make the checkbox work, add this into the handleChange function (at the top of the function)
-```if(e.target.name === 'done'){
+```js
+if(e.target.name === 'done'){
       e.target.value = !this.state.formData.done
-    } ```
+    } 
+```
 
 - Maybe we have added some we don't want, lets add a handleDeleteTodo
 
-```handleDeleteTodo = async id => {
+```js
+handleDeleteTodo = async id => {
     await todosAPI.deleteOne(id)
     this.setState({
       todos: this.state.todos.filter(todo => todo._id !== id)
     })
-  }```
+  }
+  ```
 
 - Want to cross some things off your list?
 
-```handleUpdateTodo = async updatedTodoData => {
+```js
+handleUpdateTodo = async updatedTodoData => {
     console.log('handleUpdateTodo')
     const updatedTodo = await todosAPI.update(updatedTodoData)
     const newTodosArray = this.state.todos.map(todo => todo._id === updatedTodo._id ? updatedTodo : todo)
     this.setState({
       todos: newTodosArray
     })
-  }```
+  }
+  ```
 
 - Let's add all those functions for to buy too: 
 
-```handleUpdateTobuy = async updatedTobuyData => {
+```js
+handleUpdateTobuy = async updatedTobuyData => {
     const updatedTobuy = await tobuysAPI.update(updatedTobuyData)
     const newTobuysArray = this.state.tobuys.map(tobuy => tobuy._id === updatedTobuy._id ? updatedTobuy : tobuy)
     this.setState({
@@ -428,7 +502,8 @@ handleAddTobuy = async tobuy => {
     this.setState({
       tobuys: [...this.state.tobuys, newTobuy]
     })
-  }```
+  }
+  ```
 
 
 
