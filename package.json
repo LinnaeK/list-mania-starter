@@ -10,7 +10,7 @@
     "express": "^4.17.1",
     "favicon": "0.0.2",
     "logger": "0.0.1",
-    "mongoose": "^5.9.7",
+    "mongoose": "^8.9.5",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.3",
     "path": "^0.12.7",
